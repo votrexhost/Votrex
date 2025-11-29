@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vortex - استضافة البوتات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* الأساسيات */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-black: #000000;
+            --dark-black: #1a1a1a;
+            --medium-black: #2d2d2d;
+            --light-black: #3d3d3d;
+            --primary-red: #dc2626;
+            --light-red: #ef4444;
+            --very-light-red: #fecaca;
+            --dark-red: #991b1b;
+            --white: #ffffff;
+            --light-gray: #f3f4f6;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-black) 0%, var(--dark-black) 50%, var(--dark-red) 100%);
+            color: var(--white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* الهيدر */
+        header {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--dark-red);
+        }
+
+        /* الشعار على اليسار */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-black);
+            font-weight: 900;
+            font-size: 1.4rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+
+        .logo-text {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* هامبرغر مينو على اليمين */
+        .hamburger {
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1001;
+        }
+
+        .hamburger-line {
+            width: 25px;
+            height: 3px;
+            background: var(--white);
+            margin: 5px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+            background: var(--primary-red);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+            background: var(--primary-red);
+        }
+
+        /* القائمة الجانبية على اليمين */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100vh;
+            background: rgba(26, 26, 26, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 6rem 2rem 2rem 2rem;
+            transition: 0.4s ease-in-out;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+            border-left: 1px solid var(--dark-red);
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 1.5rem 0;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.4s ease;
+        }
+
+        .sidebar.active .nav-links li {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .nav-links li:nth-child(1) { transition-delay: 0.1s; }
+        .nav-links li:nth-child(2) { transition-delay: 0.2s; }
+        .nav-links li:nth-child(3) { transition-delay: 0.3s; }
+        .nav-links li:nth-child(4) { transition-delay: 0.4s; }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 1.2rem;
+            padding: 0.8rem 1rem;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: var(--primary-red);
+            transform: translateX(-5px);
+        }
+
+        /* القسم الرئيسي */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .vortex-title {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-red), var(--light-red), var(--dark-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 30px rgba(220, 38, 38, 0.5);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--white), var(--very-light-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            color: var(--light-gray);
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, var(--primary-red), var(--dark-red));
+            color: var(--white);
+            padding: 1.2rem 2.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.3);
+            font-weight: 600;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.5);
+        }
+
+        /* قسم البطاقات */
+        .features {
+            padding: 6rem 2rem;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(45, 45, 45, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(220, 38, 38, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+            text-align: center;
+        }
+
+        .feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-red);
+            box-shadow: 0 15px 40px rgba(220, 38, 38, 0.15);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: var(--light-gray);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* الفوتر */
+        footer {
+            background: var(--primary-black);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--dark-red);
+        }
+
+        footer p {
+            color: var(--light-gray);
+            font-size: 1rem;
+        }
+
+        /* الجسيمات المتحركة */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--primary-red);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* ريسبونسيف */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .vortex-title {
+                font-size: 3.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .sidebar {
+                width: 280px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .vortex-title {
+                font-size: 2.8rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .cta-button {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- الجسيمات المتحركة -->
+    <div class="particles" id="particles"></div>
+
+    <!-- الهيدر -->
+    <header>
+        <!-- الشعار على اليسار -->
+        <div class="logo">
+            <div class="logo-icon">
+                <span>V</span>
+            </div>
+            <span class="logo-text">Vortex</span>
+        </div>
+        
+        <!-- هامبرغر مينو على اليمين -->
+        <div class="hamburger" id="hamburger">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+        </div>
+    </header>
+
+    <!-- القائمة الجانبية على اليمين -->
+    <nav class="sidebar" id="sidebar">
+        <ul class="nav-links">
+            <li><a href="#">الرئيسية</a></li>
+            <li><a href="#">الخدمات</a></li>
+            <li><a href="#">الأسعار</a></li>
+            <li><a href="#">اتصل بنا</a></li>
+        </ul>
+    </nav>
+
+    <!-- القسم الرئيسي -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="vortex-title">Vortex</div>
+            <h1>استضافة البوتات<br>بأداء استثنائي</h1>
+            <p>منصة Vortex توفر لك بيئة متكاملة لاستضافة بوتات التليجرام والديسكورد بأعلى معايير الأداء والأمان</p>
+            <a href="#" class="cta-button">ابدأ رحلتك الآن</a>
+        </div>
+    </section>
+
+    <!-- قسم البطاقات -->
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>بوتات متعددة</h3>
+                <p>استضافة بوتات تيليجرام وديسكورد في مكان واحد مع إدارة مركزية متكاملة وسهلة الاستخدام</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>أداء عالي</h3>
+                <p>سرعة فائقة في التشغيل مع وقت تشغيل يصل إلى 99.9% لضمان استمرارية الخدمة دون انقطاع</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>حماية كاملة</h3>
+                <p>بيئة آمنة ومحمية مع نسخ احتياطي تلقائي وحماية متقدمة من الهجمات الإلكترونية</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer>
+        <p>© 2024 Vortex. جميع الحقوق محفوظة</p>
+    </footer>
+
+    <script>
+        // إنشاء الجسيمات المتحركة
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 40;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                particle.style.opacity = Math.random() * 0.7;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // التحكم في القائمة الجانبية
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('active');
+        });
+
+        // إغلاق القائمة عند النقر خارجها
+        document.addEventListener('click', (e) => {
+            if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('active');
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // منع انتشار النقر داخل القائمة
+        sidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // أنيمايشن البطاقات عند التمرير
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+        });
+    </script>
+</body>
+</html>
